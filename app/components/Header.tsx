@@ -1,14 +1,6 @@
-import type { MetaFunction } from "@remix-run/node";
 import { Link } from "@remix-run/react";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "Verse Bytes" },
-    { name: "description", content: "Simple blog by Maria Torrente" },
-  ];
-};
-
-export default function Index() {
+export default function Header() {
   return (
     <nav className="flex items-center justify-between bg-gray-800 text-white p-4">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
@@ -23,10 +15,10 @@ export default function Index() {
             Login
           </Link>
           <Link
-            to="/blogs"
+            to="/blog"
             className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-300"
           >
-            Posts
+            Blog
           </Link>
         </div>
       </div>
