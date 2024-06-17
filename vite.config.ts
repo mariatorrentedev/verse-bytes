@@ -13,4 +13,5 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  envDir: process.cwd(),
 });

@@ -11,16 +11,23 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@prisma/client": "^5.15.0",
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",
     "@remix-run/serve": "^2.9.2",
+    "@types/node": "^20.14.2",
     "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
     "isbot": "^4.1.0",
+    "mdx-bundler": "^10.0.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.9.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
