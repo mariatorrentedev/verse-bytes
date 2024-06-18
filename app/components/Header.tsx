@@ -15,6 +15,12 @@ export default function Header() {
             Login
           </Link>
           <Link
+            to="/logout"
+            className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-300 mr-4"
+          >
+            Logout
+          </Link>
+          <Link
             to="/blog"
             className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-gray-300"
           >

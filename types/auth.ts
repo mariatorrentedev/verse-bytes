@@ -1,4 +1,5 @@
-export type LoginResponse = {
-  token: boolean;
-  error?: string;
+export type LoginForm = {
+  email: string;
+  password: string;
+  name?: string;
 };
