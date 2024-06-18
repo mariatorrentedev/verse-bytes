@@ -1,28 +1,33 @@
 import type { User } from "types/user";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { Form, useLoaderData } from "@remix-run/react";
-import { getUserById, updateUser } from "services/user";
-import { requireUserId } from "../utils/auth.server";
+import { requireAuth } from "../utils/auth.server";
 
 type MeLoader = {
   user: User | null;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const userId = await requireUserId(request, "/login");
-  const user = await getUserById(userId);
-  return { user };
+  try {
+    const user = await requireAuth(request);
+    // If authenticated, load data for authenticated user
+    return json({ user });
+  } catch (error) {
+    return redirect("/login"); // Redirect to login page if not authenticated
+  }
 };
 
 export default function Me() {
   const { user } = useLoaderData<MeLoader>();
-
   return (
     <div className="max-w-md mx-auto my-8 p-4 border rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold mb-4">Here's your profile.</h1>
+      <h1 className="text-2xl font-bold mb-4">{`Here's your profile.`}</h1>
       <Form method="put">
         <div className="mb-4">
-          <label className="block mb-1">Name:</label>
+          <label className="block mb-1" htmlFor="name">
+            Name:
+          </label>
           <input
             type="text"
             name="name"
@@ -32,7 +37,9 @@ export default function Me() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-1">Email:</label>
+          <label className="block mb-1" htmlFor="email">
+            Email:
+          </label>
           <input
             type="email"
             name="email"

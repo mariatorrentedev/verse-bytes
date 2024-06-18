@@ -2,7 +2,7 @@ import { db } from "../app/utils/db.server";
 
 export const createUser = async (
   email: string,
-  passwordHash: string,
+  passwordHash?: string,
   name?: string
 ) => {
   return await db.$transaction(async (prisma) => {
@@ -14,12 +14,14 @@ export const createUser = async (
       },
     });
 
-    await prisma.password.create({
-      data: {
-        hash: passwordHash,
-        userId: newUser.id,
-      },
-    });
+    if (passwordHash) {
+      await prisma.password.create({
+        data: {
+          hash: passwordHash,
+          userId: newUser.id,
+        },
+      });
+    }
 
     return newUser;
   });
@@ -66,6 +68,6 @@ export const deleteUser = async (email: string) => {
   });
 };
 
-export const deleteAllUsers = async () => {
+export const deleteUsers = async () => {
   return await db.user.deleteMany();
 };
