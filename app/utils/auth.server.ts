@@ -1,3 +1,4 @@
+import type { LoginForm } from "types/auth";
 import { redirect } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import { GoogleStrategy } from "remix-auth-google";
@@ -9,16 +10,16 @@ import {
 } from "services/user";
 import { getOAuthAccount, createOAuthAccount } from "services/auth";
 import { sessionStorage } from "./session.server";
-import type { LoginForm } from "types/auth";
+import { config } from "config";
 
 export const authenticator = new Authenticator(sessionStorage);
 
 // Google OAuth2 Strategy using under the hood remix-auth-oauth2
 const googleStrategy = new GoogleStrategy(
   {
-    clientID: process.env.GOOGLE_CLIENT_ID!,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    callbackURL: "http://localhost:5173/auth/google/callback",
+    clientID: config.GOOGLE_CLIENT_ID!,
+    clientSecret: config.GOOGLE_CLIENT_SECRET!,
+    callbackURL: `${config.BASE_URL}/auth/google/callback`,
   },
   async ({ accessToken, refreshToken, extraParams, profile }) => {
     const email = profile.emails[0].value;
