@@ -8,7 +8,7 @@ import {
 } from "services/user";
 
 export async function register({ email, password }: LoginForm): Promise<User> {
-  // Just double checkin, edge case.
+  // Just double check, edge case.
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
