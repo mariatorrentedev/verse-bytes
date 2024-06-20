@@ -4,14 +4,11 @@ import VerseBytesLogo from "assets/verse-bytes-light.png";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 
 export default function Header() {
-  const navItems = [
-    { name: "Logout", path: "/logout" },
-    { name: "Blog", path: "/blog" },
-  ];
+  const navItems = [{ name: "Blog", path: "/blog" }];
 
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  return (    
+  return (
     <nav className="bg-gray-800 text-white px-8 py-10 w-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center">

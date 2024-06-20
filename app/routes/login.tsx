@@ -1,34 +1,38 @@
 import * as React from "react";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import type { ActionData } from "types/common";
-import { json, redirect } from "@remix-run/node";
-import { useActionData, useFetcher } from "@remix-run/react";
+import { AuthorizationError } from "remix-auth";
+import { json } from "@remix-run/node";
+import { useActionData, Form } from "@remix-run/react";
 import { authenticator } from "../utils/auth.server";
 import { AtSymbolIcon } from "@heroicons/react/24/outline";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request);
-  if (user) {
-    return redirect("/me");
-  }
-  return { user };
+  return await authenticator.isAuthenticated(request, {
+    successRedirect: "/me",
+  });
 };
 
 export const action: ActionFunction = async ({ request }) => {
   try {
     await authenticator.authenticate("form", request, {
       successRedirect: "/me",
-      failureRedirect: "/login",
+      throwOnError: true,
     });
   } catch (error) {
-    return json({ error });
+    // Because redirects work by throwing a Response, you need to check if the
+    // caught error is a response and return it or throw it again
+    if (error instanceof Response) return error;
+    if (error instanceof AuthorizationError) {
+      // here the error is related to the authentication process
+      return json({ error: error.message });
+    }
   }
 };
 
 export default function Login() {
   const actionData = useActionData<ActionData>();
-  const fetcher = useFetcher();
-  const [showForm, setShowForm] = React.useState(true);
+  const [showForm, setShowForm] = React.useState(false);
   const [loginType, setLoginType] = React.useState("register");
 
   const toggleForm = () => {
@@ -41,13 +45,7 @@ export default function Login() {
         {loginType === "login" ? "Login with Email" : "Create an Account"}
       </h1>
 
-      {actionData?.error && (
-        <p className="text-red-600 text-sm mt-1" role="alert">
-          {actionData.error}
-        </p>
-      )}
-
-      <div className="flex flex-col items-center space-y-4">
+      <div className="flex flex-col items-center jus space-y-4">
         <a
           href="/auth/google"
           className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300 flex justify-center items-center"
@@ -66,7 +64,7 @@ export default function Login() {
         </button>
       </div>
       {showForm && (
-        <fetcher.Form method="post" className="mt-6">
+        <Form method="post" className="mt-6">
           <input type="hidden" name="loginType" value={loginType} />
           <div className="mb-4">
             <label
@@ -80,21 +78,7 @@ export default function Login() {
               id="email-input"
               name="email"
               className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              defaultValue={actionData?.fields?.email}
-              aria-invalid={Boolean(actionData?.fieldErrors?.email)}
-              aria-describedby={
-                actionData?.fieldErrors?.email ? "email-error" : undefined
-              }
             />
-            {actionData?.fieldErrors?.email && (
-              <p
-                className="text-red-600 text-sm mt-1"
-                role="alert"
-                id="email-error"
-              >
-                {actionData.fieldErrors.email}
-              </p>
-            )}
           </div>
           <div className="mb-4">
             <label
@@ -108,26 +92,12 @@ export default function Login() {
               id="password-input"
               name="password"
               className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
-              defaultValue={actionData?.fields?.password}
-              aria-invalid={Boolean(actionData?.fieldErrors?.password)}
-              aria-describedby={
-                actionData?.fieldErrors?.password ? "password-error" : undefined
-              }
             />
-            {actionData?.fieldErrors?.password && (
-              <p
-                className="text-red-600 text-sm mt-1"
-                role="alert"
-                id="password-error"
-              >
-                {actionData.fieldErrors.password}
-              </p>
-            )}
           </div>
-          {actionData?.formError && (
+          {actionData?.error && (
             <div id="form-error-message" className="mb-4">
-              <p className="text-red-600 text-sm" role="alert">
-                {actionData.formError}
+              <p className="text-red-600 text-sm m-3" role="alert">
+                {actionData.error}
               </p>
             </div>
           )}
@@ -137,7 +107,7 @@ export default function Login() {
           >
             Submit
           </button>
-        </fetcher.Form>
+        </Form>
       )}
       <p className="text-center mt-6 mb-4">
         {loginType === "login" ? "New here?" : "Already have an account?"}

@@ -1,24 +1,17 @@
-import type { LoginForm } from "types/auth";
 import type { User } from "types/user";
-import type { ActionData } from "types/common";
-import type { TypedResponse } from "@remix-run/node";
-import { json } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import { GoogleStrategy } from "remix-auth-google";
-import { FormStrategy } from "services/form";
-import bcrypt from "bcryptjs";
-import {
-  createUser,
-  getUserByEmail,
-  getUserWithPasswordByEmail,
-} from "services/user";
+import { FormStrategy } from "remix-auth-form";
+import { createUser, getUserByEmail } from "services/user";
 import { getOAuthAccount, createOAuthAccount } from "services/auth";
 import { sessionStorage } from "./session.server";
 import { config } from "config";
+import { login, register } from "./register.server";
+import { validateEmail, validatePassword } from "./validator";
 
-export const authenticator = new Authenticator<
-  User | null | TypedResponse<ActionData>
->(sessionStorage);
+export const authenticator = new Authenticator<User | null>(sessionStorage, {
+  sessionErrorKey: "authenticator-error",
+});
 
 // Google OAuth2 Strategy using under the hood remix-auth-oauth2
 const googleStrategy = new GoogleStrategy<User | null>(
@@ -33,12 +26,13 @@ const googleStrategy = new GoogleStrategy<User | null>(
     const provider = "google";
 
     let user = await getUserByEmail(email);
+
     if (!user) {
       user = await createUser(email, undefined, profile.displayName);
     }
 
     if (!providerId) {
-      return null;
+      throw new Error("No providerId related to this account.");
     }
 
     const oauthAccount = getOAuthAccount(provider, providerId);
@@ -53,71 +47,6 @@ const googleStrategy = new GoogleStrategy<User | null>(
 
 authenticator.use(googleStrategy);
 
-export const requireAuth = async (request: Request) => {
-  const user = await authenticator.isAuthenticated(request);
-  if (!user) {
-    throw new Error("Unauthorized: You need to Login to access this page.");
-  }
-  return user;
-};
-
-export async function register({ email, password }: LoginForm) {
-  // Validate input
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
-
-  // Check if the email is already registered
-  const existingUser = await getUserByEmail(email);
-
-  if (existingUser) {
-    throw new Error("Email is already registered");
-  }
-
-  // Hash the pasword
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  return createUser(email, passwordHash);
-}
-
-export async function login({
-  email,
-  password,
-}: LoginForm): Promise<User | null> {
-  const userWithPassword = await getUserWithPasswordByEmail(email);
-
-  if (!userWithPassword || !userWithPassword.password) {
-    return null;
-  }
-
-  const isValid = await bcrypt.compare(
-    password,
-    userWithPassword.password.hash
-  );
-
-  if (!isValid) {
-    return null;
-  }
-
-  const { password: _password, ...userWithoutPassword } = userWithPassword;
-
-  return userWithoutPassword;
-}
-
-function validateUsername(email: unknown) {
-  if (typeof email !== "string" || email.length < 3) {
-    return `Usernames must be at least 3 characters long`;
-  }
-}
-
-function validatePassword(password: unknown) {
-  if (typeof password !== "string" || password.length < 6) {
-    return `Passwords must be at least 6 characters long`;
-  }
-}
-
-const badRequest = (data: ActionData) => json(data, { status: 400 });
-
 // Use the custom Form Strategy
 authenticator.use(
   new FormStrategy(async ({ form }) => {
@@ -130,40 +59,30 @@ authenticator.use(
       typeof email !== "string" ||
       typeof password !== "string"
     ) {
-      return badRequest({
-        error: "Error while signing up.",
-      });
+      throw new Error("Form not submitted correctly.");
     }
 
-    const fields = { loginType, email, password };
-    const fieldErrors = {
-      username: validateUsername(email),
-      password: validatePassword(password),
-    };
-    if (Object.values(fieldErrors).some(Boolean)) {
-      return badRequest({
-        error: "Error while signing up.",
-      });
-    }
+    validateEmail(email);
+    validatePassword(password);
 
-    let user = null;
+    let user: User | null = null;
 
-    if (loginType == "login") {
-      user = await login({ email, password });
-    } else if (loginType === "register") {
-      try {
-        user = await register({ email, password });
-      } catch (error) {
-        return badRequest({
-          error: "Error while signing up.",
-        });
-      }
+    if (loginType === "register") {
+      user = await register({ email, password });
     } else {
-      badRequest({
-        error: "Something went wrong.",
-      });
+      user = await login({ email, password });
     }
 
     return user;
   })
 );
+
+export const requireAuth = async (request: Request): Promise<User | null> => {
+  const user = authenticator.isAuthenticated(request);
+
+  if (!user) {
+    throw new Error("Unauthorized: You need to Login to access this page.");
+  }
+
+  return user;
+};
