@@ -1,21 +1,20 @@
-import type { LoginForm } from "types/auth";
-import { redirect } from "@remix-run/node";
+import type { User } from "types/user";
 import { Authenticator } from "remix-auth";
 import { GoogleStrategy } from "remix-auth-google";
-import bcrypt from "bcryptjs";
-import {
-  createUser,
-  getUserByEmail,
-  getUserWithPasswordByEmail,
-} from "services/user";
+import { FormStrategy } from "remix-auth-form";
+import { createUser, getUserByEmail } from "services/user";
 import { getOAuthAccount, createOAuthAccount } from "services/auth";
 import { sessionStorage } from "./session.server";
 import { config } from "config";
+import { login, register } from "./register.server";
+import { validateEmail, validatePassword } from "./validator";
 
-export const authenticator = new Authenticator(sessionStorage);
+export const authenticator = new Authenticator<User | null>(sessionStorage, {
+  sessionErrorKey: "authenticator-error",
+});
 
 // Google OAuth2 Strategy using under the hood remix-auth-oauth2
-const googleStrategy = new GoogleStrategy(
+const googleStrategy = new GoogleStrategy<User | null>(
   {
     clientID: config.GOOGLE_CLIENT_ID!,
     clientSecret: config.GOOGLE_CLIENT_SECRET!,
@@ -27,12 +26,13 @@ const googleStrategy = new GoogleStrategy(
     const provider = "google";
 
     let user = await getUserByEmail(email);
+
     if (!user) {
       user = await createUser(email, undefined, profile.displayName);
     }
 
     if (!providerId) {
-      return null;
+      throw new Error("No providerId related to this account.");
     }
 
     const oauthAccount = getOAuthAccount(provider, providerId);
@@ -47,77 +47,42 @@ const googleStrategy = new GoogleStrategy(
 
 authenticator.use(googleStrategy);
 
-export async function register({ email, password }: LoginForm) {
-  // Validate input
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
+// Use the custom Form Strategy
+authenticator.use(
+  new FormStrategy(async ({ form }) => {
+    const email = form.get("email");
+    const password = form.get("password");
+    const loginType = form.get("loginType");
 
-  // Check if the email is already registered
-  const existingUser = await getUserByEmail(email);
+    if (
+      typeof loginType !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string"
+    ) {
+      throw new Error("Form not submitted correctly.");
+    }
 
-  if (existingUser) {
-    throw new Error("Email is already registered");
-  }
+    validateEmail(email);
+    validatePassword(password);
 
-  // Hash the pasword
-  const passwordHash = await bcrypt.hash(password, 10);
+    let user: User | null = null;
 
-  return createUser(email, passwordHash);
-}
+    if (loginType === "register") {
+      user = await register({ email, password });
+    } else {
+      user = await login({ email, password });
+    }
 
-export async function login({ email, password }: LoginForm) {
-  const userWithPassword = await getUserWithPasswordByEmail(email);
+    return user;
+  })
+);
 
-  if (!userWithPassword || !userWithPassword.password) {
-    return null;
-  }
+export const requireAuth = async (request: Request): Promise<User | null> => {
+  const user = authenticator.isAuthenticated(request);
 
-  const isValid = await bcrypt.compare(
-    password,
-    userWithPassword.password.hash
-  );
-
-  if (!isValid) {
-    return null;
-  }
-
-  const { password: _password, ...userWithoutPassword } = userWithPassword;
-
-  return userWithoutPassword;
-}
-
-export async function createUserSession(userId: string, redirectTo: string) {
-  const session = await sessionStorage.getSession();
-  session.set("userId", userId);
-  return redirect(redirectTo, {
-    headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
-    },
-  });
-}
-
-export const requireAuth = async (request: Request) => {
-  const user = await authenticator.isAuthenticated(request);
   if (!user) {
-    throw new Error("Unauthorized");
+    throw new Error("Unauthorized: You need to Login to access this page.");
   }
+
   return user;
 };
-
-export async function requireUserId(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-): Promise<string> {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const userId = session.get("userId");
-  if (!userId) {
-    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(
-      redirectTo && redirectTo !== "/" ? `/login?${searchParams}` : `/login`
-    );
-  }
-  return userId;
-}

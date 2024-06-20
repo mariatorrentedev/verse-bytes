@@ -1,4 +1,8 @@
 export type User = {
-  name: string;
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
   email: string;
+  name: string | null;
+  role: string;
 };
