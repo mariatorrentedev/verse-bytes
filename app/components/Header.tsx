@@ -11,7 +11,7 @@ export default function Header() {
 
   const [menuOpen, setMenuOpen] = React.useState(false);
 
-  return (
+  return (    
     <nav className="bg-gray-800 text-white px-8 py-10 w-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
