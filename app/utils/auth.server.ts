@@ -1,7 +1,11 @@
 import type { LoginForm } from "types/auth";
-import { redirect } from "@remix-run/node";
+import type { User } from "types/user";
+import type { ActionData } from "types/common";
+import type { TypedResponse } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
 import { GoogleStrategy } from "remix-auth-google";
+import { FormStrategy } from "services/form";
 import bcrypt from "bcryptjs";
 import {
   createUser,
@@ -12,10 +16,12 @@ import { getOAuthAccount, createOAuthAccount } from "services/auth";
 import { sessionStorage } from "./session.server";
 import { config } from "config";
 
-export const authenticator = new Authenticator(sessionStorage);
+export const authenticator = new Authenticator<
+  User | null | TypedResponse<ActionData>
+>(sessionStorage);
 
 // Google OAuth2 Strategy using under the hood remix-auth-oauth2
-const googleStrategy = new GoogleStrategy(
+const googleStrategy = new GoogleStrategy<User | null>(
   {
     clientID: config.GOOGLE_CLIENT_ID!,
     clientSecret: config.GOOGLE_CLIENT_SECRET!,
@@ -47,6 +53,14 @@ const googleStrategy = new GoogleStrategy(
 
 authenticator.use(googleStrategy);
 
+export const requireAuth = async (request: Request) => {
+  const user = await authenticator.isAuthenticated(request);
+  if (!user) {
+    throw new Error("Unauthorized: You need to Login to access this page.");
+  }
+  return user;
+};
+
 export async function register({ email, password }: LoginForm) {
   // Validate input
   if (!email || !password) {
@@ -66,7 +80,10 @@ export async function register({ email, password }: LoginForm) {
   return createUser(email, passwordHash);
 }
 
-export async function login({ email, password }: LoginForm) {
+export async function login({
+  email,
+  password,
+}: LoginForm): Promise<User | null> {
   const userWithPassword = await getUserWithPasswordByEmail(email);
 
   if (!userWithPassword || !userWithPassword.password) {
@@ -87,37 +104,66 @@ export async function login({ email, password }: LoginForm) {
   return userWithoutPassword;
 }
 
-export async function createUserSession(userId: string, redirectTo: string) {
-  const session = await sessionStorage.getSession();
-  session.set("userId", userId);
-  return redirect(redirectTo, {
-    headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
-    },
-  });
+function validateUsername(email: unknown) {
+  if (typeof email !== "string" || email.length < 3) {
+    return `Usernames must be at least 3 characters long`;
+  }
 }
 
-export const requireAuth = async (request: Request) => {
-  const user = await authenticator.isAuthenticated(request);
-  if (!user) {
-    throw new Error("Unauthorized");
+function validatePassword(password: unknown) {
+  if (typeof password !== "string" || password.length < 6) {
+    return `Passwords must be at least 6 characters long`;
   }
-  return user;
-};
-
-export async function requireUserId(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-): Promise<string> {
-  const session = await sessionStorage.getSession(
-    request.headers.get("Cookie")
-  );
-  const userId = session.get("userId");
-  if (!userId) {
-    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(
-      redirectTo && redirectTo !== "/" ? `/login?${searchParams}` : `/login`
-    );
-  }
-  return userId;
 }
+
+const badRequest = (data: ActionData) => json(data, { status: 400 });
+
+// Use the custom Form Strategy
+authenticator.use(
+  new FormStrategy(async ({ form }) => {
+    const email = form.get("email");
+    const password = form.get("password");
+    const loginType = form.get("loginType");
+
+    if (
+      typeof loginType !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string"
+    ) {
+      return badRequest({
+        error: "Error while signing up.",
+      });
+    }
+
+    const fields = { loginType, email, password };
+    const fieldErrors = {
+      username: validateUsername(email),
+      password: validatePassword(password),
+    };
+    if (Object.values(fieldErrors).some(Boolean)) {
+      return badRequest({
+        error: "Error while signing up.",
+      });
+    }
+
+    let user = null;
+
+    if (loginType == "login") {
+      user = await login({ email, password });
+    } else if (loginType === "register") {
+      try {
+        user = await register({ email, password });
+      } catch (error) {
+        return badRequest({
+          error: "Error while signing up.",
+        });
+      }
+    } else {
+      badRequest({
+        error: "Something went wrong.",
+      });
+    }
+
+    return user;
+  })
+);

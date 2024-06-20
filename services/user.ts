@@ -1,10 +1,11 @@
+import type { User } from "types/user";
 import { db } from "../app/utils/db.server";
 
 export const createUser = async (
   email: string,
   passwordHash?: string,
   name?: string
-) => {
+): Promise<User> => {
   return await db.$transaction(async (prisma) => {
     const newUser = await prisma.user.create({
       data: {
@@ -27,7 +28,7 @@ export const createUser = async (
   });
 };
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string): Promise<User | null> => {
   return await db.user.findUnique({
     where: { email },
   });
@@ -42,17 +43,20 @@ export const getUserWithPasswordByEmail = async (email: string) => {
   });
 };
 
-export const getUserById = async (id: string) => {
+export const getUserById = async (id: string): Promise<User | null> => {
   return await db.user.findUnique({
     where: { id },
   });
 };
 
-export const getUsers = async () => {
+export const getUsers = async (): Promise<User[] | null> => {
   return await db.user.findMany();
 };
 
-export const updateUser = async (email?: string, name?: string) => {
+export const updateUser = async (
+  email?: string,
+  name?: string
+): Promise<User | null> => {
   return await db.user.update({
     where: { email },
     data: {
@@ -62,7 +66,7 @@ export const updateUser = async (email?: string, name?: string) => {
   });
 };
 
-export const deleteUser = async (email: string) => {
+export const deleteUser = async (email: string): Promise<User | null> => {
   return await db.user.delete({
     where: { email },
   });

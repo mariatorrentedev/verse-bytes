@@ -20,6 +20,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Me() {
   const { user } = useLoaderData<MeLoader>();
+
   return (
     <div className="max-w-md mx-auto my-8 p-4 border rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-4">{`Here's your profile.`}</h1>
