@@ -1,11 +1,23 @@
-export function validateEmail(email: unknown) {
-  if (typeof email !== "string" || email.length < 3) {
-    throw new Error("Usernames must be at least 3 characters long");
+export function validateEmail(email: unknown): void {
+  if (typeof email !== "string") {
+    throw new Error("Email must be a string.");
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new Error("Invalid email format.");
   }
 }
 
-export function validatePassword(password: unknown) {
-  if (typeof password !== "string" || password.length < 6) {
-    throw new Error(`Passwords must be at least 6 characters long`);
+export function validatePassword(password: unknown): void {
+  if (typeof password !== "string") {
+    throw new Error("Password must be a string.");
+  }
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{6,}$/;
+  if (!passwordRegex.test(password)) {
+    throw new Error(
+      "Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character."
+    );
   }
 }

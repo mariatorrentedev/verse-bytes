@@ -9,10 +9,12 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   return (
-    <nav className="bg-gray-800 text-white px-8 py-10 w-full">
+    <nav className="text-white px-8 py-10 w-full">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
-          <h1 className="text-5xl font-semibold">Verse Bytes</h1>
+          <Link to="/">
+            <h1 className="text-5xl font-semibold">Verse Bytes</h1>
+          </Link>
         </div>
         <div className="flex items-center justify-center lg:hidden">
           <button
