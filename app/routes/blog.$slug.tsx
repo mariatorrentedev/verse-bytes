@@ -5,7 +5,7 @@ import { getMdxContent } from "../utils/mdx.server";
 import { getMDXComponent } from "mdx-bundler/client";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 
-// TODO: improve typing.
+// TODO: improve types.
 type LoaderData = {
   frontmatter: Record<string, any>;
   code: string;
