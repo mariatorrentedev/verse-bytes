@@ -1,2 +1,3 @@
-export { default as Header } from "./Header";
-export { default as Footer } from "./Footer";
+export { default as Header } from "./header";
+export { default as Footer } from "./footer";
+export { default as ErrorPage } from "./error";
