@@ -1,9 +1,10 @@
+import type { MdxPage } from "types/common";
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { bundleMDX } from "mdx-bundler";
 
-export async function getMdxContent(slug: string) {
+export async function getMdxPage(slug: string): Promise<MdxPage> {
   const filePath = path.join(process.cwd(), "content", "blog", `${slug}.mdx`);
   const source = fs.readFileSync(filePath, "utf8");
 
@@ -14,16 +15,17 @@ export async function getMdxContent(slug: string) {
 
   return {
     code,
+    slug,
     frontmatter,
   };
 }
 
 export function getAllPosts() {
-  const postsDirectory = path.join(process.cwd(), "content", "blog");
-  const filenames = fs.readdirSync(postsDirectory);
+  const blogDir = path.join(process.cwd(), "content", "blog");
+  const filenames = fs.readdirSync(blogDir);
 
   const posts = filenames.map((filename) => {
-    const filePath = path.join(postsDirectory, filename);
+    const filePath = path.join(blogDir, filename);
     const fileContents = fs.readFileSync(filePath, "utf8");
     const { data } = matter(fileContents);
 

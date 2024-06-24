@@ -21,6 +21,7 @@
     "mdx-bundler": "^10.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "reading-time": "^1.5.0",
     "remix-auth": "^3.7.0",
     "remix-auth-form": "^1.5.0",
     "remix-auth-google": "^2.0.0"

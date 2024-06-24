@@ -1,15 +1,10 @@
 import type { LoaderFunction } from "@remix-run/node";
+import type { MdxPage } from "types/common";
 import * as React from "react";
 import { useLoaderData, Link } from "@remix-run/react";
-import { getMdxContent } from "../utils/mdx.server";
+import { getMdxPage } from "../utils/mdx.server";
 import { getMDXComponent } from "mdx-bundler/client";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
-
-// TODO: improve types.
-type LoaderData = {
-  frontmatter: Record<string, any>;
-  code: string;
-};
 
 export const loader: LoaderFunction = async ({ params }) => {
   const { slug } = params;
@@ -19,12 +14,12 @@ export const loader: LoaderFunction = async ({ params }) => {
     });
   }
 
-  const mdxContent = await getMdxContent(slug);
-  return mdxContent;
+  const mdxPage = await getMdxPage(slug);
+  return mdxPage;
 };
 
 export default function BlogPost() {
-  const { frontmatter, code } = useLoaderData<LoaderData>();
+  const { frontmatter, code } = useLoaderData<MdxPage>();
 
   //Memoize it to avoid re-creating on every render.
   const Component = React.useMemo(() => getMDXComponent(code), [code]);
