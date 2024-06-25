@@ -22,4 +22,6 @@ export type MdxPage = {
   };
 };
 
-export type MdxListItem = Omit<MdxPage, "code">;
+type Frontmatter = MdxPage["frontmatter"];
+
+export type MdxListItem = Omit<MdxPage, "code" | "frontmatter"> & Frontmatter;

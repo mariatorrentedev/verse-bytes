@@ -1,6 +1,7 @@
 import type { LoaderFunction } from "@remix-run/node";
 import type { MdxPage } from "types/common";
 import * as React from "react";
+import * as Blog from "../components/blog";
 import { useLoaderData, Link } from "@remix-run/react";
 import { getMdxPage } from "../utils/mdx.server";
 import { getMDXComponent } from "mdx-bundler/client";
@@ -19,10 +20,13 @@ export const loader: LoaderFunction = async ({ params }) => {
 };
 
 export default function BlogPost() {
-  const { frontmatter, code } = useLoaderData<MdxPage>();
+  const page = useLoaderData<MdxPage>();
 
   //Memoize it to avoid re-creating on every render.
-  const Component = React.useMemo(() => getMDXComponent(code), [code]);
+  const Component = React.useMemo(
+    () => getMDXComponent(page.code),
+    [page.code]
+  );
 
   return (
     <div className="container mx-auto px-4 py-8 text-white max-w-md md:max-w-2xl lg:max-w-4xl">
@@ -33,10 +37,7 @@ export default function BlogPost() {
         <ArrowLeftCircleIcon className="h-5 w-5 mr-2" />
         Back to Overview
       </Link>
-      <h1 className="text-5xl font-bold mb-6">{frontmatter.title}</h1>
-      <article className="prose prose-lg">
-        <Component />
-      </article>
+      <Blog.Post page={page} Component={Component} />
     </div>
   );
 }

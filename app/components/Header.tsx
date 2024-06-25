@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link } from "@remix-run/react";
 import VerseBytesLogo from "assets/verse-bytes-light.png";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Header() {
   const navItems = [{ name: "Blog", path: "/blog" }];
@@ -21,7 +21,11 @@ export default function Header() {
             onClick={() => setMenuOpen(!menuOpen)}
             className="focus:outline-none"
           >
-            <Bars3Icon className="h-6 w-6" />
+            {menuOpen ? (
+              <XMarkIcon className="h-6 w-6" />
+            ) : (
+              <Bars3Icon className="h-6 w-6" />
+            )}
           </button>
         </div>
         <div>
@@ -29,7 +33,7 @@ export default function Header() {
             <img
               src={VerseBytesLogo}
               alt="Verse Bytes Logo"
-              className="h-10 w-10 transition-transform transform hover:scale-110"
+              className="h-14 w-14 transition-transform transform hover:scale-110"
             />
           </Link>
         </div>

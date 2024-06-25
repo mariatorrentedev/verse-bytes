@@ -1,16 +1,11 @@
 import type { LoaderFunction } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
+import type { MdxListItem } from "types/common";
+import { useLoaderData } from "@remix-run/react";
 import { getAllPosts } from "../utils/mdx.server";
-
-type Post = {
-  slug: string;
-  title: string;
-  description: string;
-  date: string;
-};
+import * as Blog from "../components/blog";
 
 type LoaderData = {
-  posts: Post[];
+  posts: MdxListItem[];
 };
 
 export const loader: LoaderFunction = async () => {
@@ -25,19 +20,9 @@ export default function BlogIndex() {
     <div className="container mx-auto px-4 py-8 text-white max-w-md md:max-w-2xl lg:max-w-4xl">
       <ul className="space-y-6">
         {posts.map((post) => (
-          <li key={post.slug} className="border-b pb-4 mb-4">
-            <Link
-              to={`/blog/${post.slug}`}
-              className="block bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-700 transition"
-            >
-              <p className="text-2xl font-semibold mb-2 text-white">
-                {post.title}
-              </p>
-              <p className="text-sm text-gray-400">
-                {new Date(post.date).toLocaleDateString()}
-              </p>
-            </Link>
-          </li>
+          <div key={post.slug}>
+            <Blog.PostCard post={post} />
+          </div>
         ))}
       </ul>
     </div>
