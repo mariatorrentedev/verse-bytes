@@ -14,8 +14,6 @@ export default function ErrorPage({ error }: { error: unknown }) {
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-4">Error</h1>
           <p className="text-lg mb-2">{error.message}</p>
-          <p className="text-lg mb-4">The stack trace is:</p>
-          <pre className="bg-gray-800 p-4 rounded-md">{error.stack}</pre>
         </div>
       ) : (
         <h1 className="text-3xl font-bold">Unknown Error</h1>

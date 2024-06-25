@@ -5,7 +5,7 @@ import { AuthorizationError } from "remix-auth";
 import { json } from "@remix-run/node";
 import { useActionData, Form } from "@remix-run/react";
 import { authenticator } from "../utils/auth.server";
-import { AtSymbolIcon } from "@heroicons/react/24/outline";
+import { AtSymbolIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 
 export const loader: LoaderFunction = async ({ request }) => {
   return await authenticator.isAuthenticated(request, {
@@ -40,8 +40,8 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-32 p-6 border rounded-lg shadow-lg bg-white">
-      <h1 className="text-3xl font-bold mb-6 text-center">
+    <div className="max-w-md mx-auto mt-16 p-6 border rounded-lg shadow-lg">
+      <h1 className="text-3xl font-bold mb-6 text-center text-white">
         {loginType === "login" ? "Login with Email" : "Create an Account"}
       </h1>
 
@@ -50,9 +50,7 @@ export default function Login() {
           href="/auth/google"
           className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300 flex justify-center items-center"
         >
-          <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M21.35 11.1H12v2.8h5.25c-.4 1.9-2 3.1-5.25 3.1-3.25 0-5.75-2.45-5.75-5.6s2.5-5.6 5.75-5.6c1.45 0 2.75.5 3.8 1.4l2.6-2.6C15.8 3.3 14 2.8 12 2.8 6.75 2.8 2.5 6.7 2.5 12s4.25 9.2 9.5 9.2c4.8 0 8.5-3.25 8.5-8.2 0-.7-.1-1.3-.15-1.9z" />
-          </svg>
+          <GlobeAltIcon className="h-6 w-6 mr-2" />
           Login with Google
         </a>
         <button
@@ -111,7 +109,7 @@ export default function Login() {
           </button>
         </Form>
       )}
-      <p className="text-center mt-6 mb-4">
+      <p className="text-center text-white mt-6 mb-4">
         {loginType === "login" ? "New here?" : "Already have an account?"}
         <button
           onClick={() =>

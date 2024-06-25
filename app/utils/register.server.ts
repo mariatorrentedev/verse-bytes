@@ -5,7 +5,7 @@ import {
   createUser,
   getUserByEmail,
   getUserWithPasswordByEmail,
-} from "services/user";
+} from "models/user";
 
 export async function register({ email, password }: LoginForm): Promise<User> {
   // Just double check, edge case.
