@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link } from "@remix-run/react";
-import VerseBytesLogo from "assets/verse-bytes-light.png";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import CloudinaryImage from "./cloudinary-image";
 
 export default function Header() {
   const navItems = [
@@ -33,10 +33,11 @@ export default function Header() {
         </div>
         <div>
           <Link to="/login">
-            <img
-              src={VerseBytesLogo}
+            <CloudinaryImage
+              publicId="verse_bytes_logo"
               alt="Verse Bytes Logo"
-              className="h-14 w-14 transition-transform transform hover:scale-110"
+              options={{ width: 50, height: 50 }}
+              className="transition-transform transform hover:scale-110"
             />
           </Link>
         </div>
