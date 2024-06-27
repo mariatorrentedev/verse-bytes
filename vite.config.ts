@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
     define: {
-      "process.env.CLOUD_NAME": JSON.stringify(env.CLOUD_NAME),
+      "process.env": env,
     },
     plugins: [
       remix({
@@ -18,6 +18,5 @@ export default defineConfig(({ mode }) => {
       }),
       tsconfigPaths(),
     ],
-    envDir: process.cwd(),
   };
 });
