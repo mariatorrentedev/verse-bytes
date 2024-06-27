@@ -9,6 +9,7 @@ export type MdxPage = {
   slug: string;
   readTime?: ReturnType<typeof calculateReadingTime>;
   frontmatter: {
+    cloudinaryImageId?: string;
     archived?: boolean;
     draft?: boolean;
     unlisted?: boolean;
