@@ -17,6 +17,7 @@
     "@remix-run/react": "^2.9.2",
     "@remix-run/serve": "^2.9.2",
     "bcryptjs": "^2.4.3",
+    "cloudinary-build-url": "^0.2.4",
     "isbot": "^4.1.0",
     "mdx-bundler": "^10.0.2",
     "react": "^18.2.0",
