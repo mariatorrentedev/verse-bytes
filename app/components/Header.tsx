@@ -1,9 +1,12 @@
 import * as React from "react";
 import { Link } from "@remix-run/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import CloudinaryImage from "./cloudinary-image";
+import { CloudinaryImage, ThemeModeButton } from "./";
+import { useTheme } from "../utils/theme-mode";
 
 export default function Header() {
+  const { theme } = useTheme();
+
   const navItems = [
     { name: "Blog", path: "/blog" },
     { name: "About", path: "/about" },
@@ -12,29 +15,32 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
   return (
-    <nav className="text-white lg:px-8 px-6 py-10 w-full">
-      <div className="flex items-center justify-between">
+    <nav>
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center">
           <Link to="/">
-            <h1 className="text-5xl font-semibold">Verse Bytes</h1>
+            <h1>Verse Bytes</h1>
           </Link>
         </div>
         <div className="flex items-center justify-center lg:hidden">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="focus:outline-none"
+            className="focus:outline-none text-primary-light dark:text-primary-dark"
           >
             {menuOpen ? (
-              <XMarkIcon className="h-6 w-6" />
+              <XMarkIcon className="i-md" />
             ) : (
-              <Bars3Icon className="h-6 w-6" />
+              <Bars3Icon className="i-md" />
             )}
           </button>
         </div>
-        <div>
+        <div className="flex">
+          <ThemeModeButton />
           <Link to="/login">
             <CloudinaryImage
-              publicId="verse_bytes_logo"
+              publicId={
+                theme === "light" ? "verse_bytes_light" : "verse-bytes-dark"
+              }
               alt="Verse Bytes Logo"
               options={{ width: 50, height: 50 }}
               className="transition-transform transform hover:scale-110"
@@ -49,10 +55,7 @@ export default function Header() {
       >
         <ul className="flex flex-col lg:flex-row lg:items-center lg:space-x-4">
           {navItems.map((item) => (
-            <li
-              key={item.name}
-              className="text-white hover:text-gray-300 transition-colors duration-300 mb-4 lg:mb-0"
-            >
+            <li key={item.name}>
               <Link to={item.path}>{item.name}</Link>
             </li>
           ))}

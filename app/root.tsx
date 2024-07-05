@@ -7,7 +7,7 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import "./tailwind.css";
-import { ErrorPage, Footer, Header } from "./components/";
+import { ErrorPage, Footer, Header, ThemeModeButton } from "./components/";
 
 export function ErrorBoundary() {
   const error = useRouteError();
@@ -20,7 +20,8 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-gray-900">
+      <body className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
+        <ThemeModeButton />
         <Header />
         <ErrorPage error={error} />
         <Scripts />
@@ -40,10 +41,12 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-gray-900">
+      <body className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
         <Header />
+        <main className="min-h-screen">
+          <Outlet />
+        </main>
         <Footer />
-        <Outlet />
         <ScrollRestoration />
         <Scripts />
       </body>

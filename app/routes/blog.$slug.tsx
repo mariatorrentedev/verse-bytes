@@ -29,12 +29,9 @@ export default function BlogPost() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 text-white max-w-md md:max-w-2xl lg:max-w-4xl">
-      <Link
-        to="/blog"
-        className="text-lg inline-flex items-center text-gray-300 hover:underline mb-4"
-      >
-        <ArrowLeftCircleIcon className="h-10 w-10 mr-2" />
+    <div className="container-md">
+      <Link to="/blog" className="text-lg inline-flex items-center mb-4">
+        <ArrowLeftCircleIcon className="h-10 w-10 mr-2 hover:dark:text-accent-dark" />
         Back to Overview
       </Link>
       <Blog.Post page={page} Component={Component} />
