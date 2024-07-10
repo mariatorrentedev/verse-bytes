@@ -7,7 +7,7 @@ export function PostCard({ post }: { post: MdxListItem }) {
   return (
     <li
       key={post.slug}
-      className="border-b border-text-light dark:border-text-dark pb-4 mb-4"
+      className="border-b border-x-accent-light dark:border-b-accent-dark border-text-light dark:border-text-dark pb-4 mb-4"
     >
       <Link to={`/blog/${post.slug}`} className="blog-link">
         <p className="text-2xl font-semibold mb-2">{post.title}</p>

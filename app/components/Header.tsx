@@ -2,10 +2,10 @@ import * as React from "react";
 import { Link } from "@remix-run/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { CloudinaryImage, ThemeModeButton } from "./";
-import { useTheme } from "../utils/theme-mode";
+import { useTheme, Theme } from "~/utils/theme-provider";
 
 export default function Header() {
-  const { theme } = useTheme();
+  const [theme] = useTheme();
 
   const navItems = [
     { name: "Blog", path: "/blog" },
@@ -39,10 +39,9 @@ export default function Header() {
           <Link to="/login">
             <CloudinaryImage
               publicId={
-                theme === "light" ? "verse_bytes_light" : "verse-bytes-dark"
+                theme === Theme.LIGHT ? "verse_bytes_light" : "verse_bytes_dark"
               }
               alt="Verse Bytes Logo"
-              options={{ width: 50, height: 50 }}
               className="transition-transform transform hover:scale-110"
             />
           </Link>

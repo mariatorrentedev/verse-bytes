@@ -1,3 +1,5 @@
+import type { LoaderFunction } from "@remix-run/node";
+import type { Theme } from "./utils/theme-provider";
 import {
   Links,
   Meta,
@@ -5,9 +7,18 @@ import {
   Scripts,
   ScrollRestoration,
   useRouteError,
+  json,
+  useLoaderData,
 } from "@remix-run/react";
 import "./tailwind.css";
 import { ErrorPage, Footer, Header, ThemeModeButton } from "./components/";
+import { ThemeProvider, useTheme } from "./utils/theme-provider";
+import { getThemeSession } from "./utils/theme.server";
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const themeSession = await getThemeSession(request);
+  return json({ theme: themeSession.getTheme() });
+};
 
 export function ErrorBoundary() {
   const error = useRouteError();
@@ -31,9 +42,11 @@ export function ErrorBoundary() {
   );
 }
 
-export default function App() {
+export function App() {
+  const [theme] = useTheme();
+
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`${theme ?? ""} h-full`}>
       <head>
         <title>Verse Bytes | Maria Torrente</title>
         <meta charSet="utf-8" />
@@ -43,7 +56,7 @@ export default function App() {
       </head>
       <body className="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark">
         <Header />
-        <main className="min-h-screen">
+        <main>
           <Outlet />
         </main>
         <Footer />
@@ -51,5 +64,15 @@ export default function App() {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+export default function AppWithProviders() {
+  const data = useLoaderData<{ theme: Theme }>();
+
+  return (
+    <ThemeProvider specifiedTheme={data.theme}>
+      <App />
+    </ThemeProvider>
   );
 }

@@ -96,7 +96,7 @@ export default function Login() {
           onClick={() =>
             setLoginType(loginType === "login" ? "register" : "login")
           }
-          className="text-primary-light dark:text-primary-dark hover:underline ml-1 focus:outline-none"
+          className="text-accent-light dark:text-accent-dark hover:underline ml-1 focus:outline-none"
         >
           {loginType === "login" ? "Create an account" : "Login"}
         </button>
