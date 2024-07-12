@@ -3,7 +3,7 @@ import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import type { ActionData } from "types/common";
 import { AuthorizationError } from "remix-auth";
 import { json } from "@remix-run/node";
-import { useActionData, Form } from "@remix-run/react";
+import { useActionData, Form, Link } from "@remix-run/react";
 import { authenticator } from "../utils/auth.server";
 import { AtSymbolIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 
@@ -40,24 +40,18 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-6 border rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold mb-6 text-center text-white">
+    <div className="login-container">
+      <h2>
         {loginType === "login" ? "Login with Email" : "Create an Account"}
-      </h1>
+      </h2>
 
-      <div className="flex flex-col items-center jus space-y-4">
-        <a
-          href="/auth/google"
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300 flex justify-center items-center"
-        >
-          <GlobeAltIcon className="h-6 w-6 mr-2" />
+      <div className="flex flex-col items-center space-y-4">
+        <Link to="/auth/google" className="btn-primary">
+          <GlobeAltIcon className="i-s" />
           Login with Google
-        </a>
-        <button
-          onClick={toggleForm}
-          className="w-full bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors duration-300 flex justify-center items-center"
-        >
-          <AtSymbolIcon className="h-6 w-6 mr-2" />
+        </Link>
+        <button onClick={toggleForm} className="btn-primary">
+          <AtSymbolIcon className="i-s" />
           {showForm ? "Cancel" : "Sign In with Email"}
         </button>
       </div>
@@ -65,33 +59,23 @@ export default function Login() {
         <Form method="post" className="mt-6">
           <input type="hidden" name="loginType" value={loginType} />
           <div className="mb-4">
-            <label
-              htmlFor="email-input"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
+            <label htmlFor="email-input">Email</label>
             <input
               type="email"
               id="email-input"
               name="email"
+              placeholder="versebytes@gmail.com"
               required
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
             />
           </div>
           <div className="mb-4">
-            <label
-              htmlFor="password-input"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
+            <label htmlFor="password-input">Password</label>
             <input
               type="password"
               id="password-input"
               required
+              placeholder="Password"
               name="password"
-              className="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-blue-500"
             />
           </div>
           {actionData?.error && (
@@ -101,28 +85,25 @@ export default function Login() {
               </p>
             </div>
           )}
-          <button
-            className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300"
-            type="submit"
-          >
+          <button className="btn-primary" type="submit">
             Submit
           </button>
         </Form>
       )}
-      <p className="text-center text-white mt-6 mb-4">
+      <p className="text-center mt-6 mb-4">
         {loginType === "login" ? "New here?" : "Already have an account?"}
         <button
           onClick={() =>
             setLoginType(loginType === "login" ? "register" : "login")
           }
-          className="text-blue-500 hover:underline ml-1 focus:outline-none"
+          className="text-accent-light dark:text-accent-dark hover:underline ml-1 focus:outline-none"
         >
           {loginType === "login" ? "Create an account" : "Login"}
         </button>
       </p>
-      <p className="text-center text-gray-600 mt-2">
+      <p className="text-center text-text-light dark:text-text-dark mt-2">
         {`Click “Sign Up” to agree to Verse Byte's Terms of Service and
-        acknowledge that Verse Byte's Privacy Policy applies to you.`}
+    acknowledge that Verse Byte's Privacy Policy applies to you.`}
       </p>
     </div>
   );

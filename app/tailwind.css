@@ -1,3 +1,66 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  h1 {
+    @apply text-5xl font-semibold;
+  }
+  h2 {
+    @apply text-3xl font-bold mb-6 text-center;
+  }
+  input {
+    @apply w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-primary-light dark:focus:border-primary-dark;
+  }
+
+  li {
+    @apply text-primary-light dark:text-primary-dark hover:underline  hover:text-accent-light dark:hover:text-accent-dark mb-4 lg:mb-0;
+  }
+  nav {
+    @apply text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark lg:px-8 px-6 py-10 w-full;
+  }
+
+  footer {
+    @apply bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark py-6 fixed bottom-0 w-full;
+  }
+
+  article {
+    @apply mt-4 text-lg;
+  }
+  a {
+    @apply cursor-pointer text-text-light dark:text-text-dark bg-background-light dark:bg-background-dark  hover:text-accent-light hover:dark:text-accent-dark p-2 lg:p-4;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply w-full bg-accent-light text-primary-light dark:bg-accent-dark dark:text-text-dark px-4 py-2 rounded-lg hover:text-text-dark hover:dark:text-accent-dark  hover:bg-primary-light dark:hover:bg-primary-light  flex justify-center items-center;
+  }
+  .login-container {
+    @apply max-w-md mx-auto mt-16 p-6 border rounded-lg shadow-lg bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark;
+  }
+  .i-s {
+    @apply h-6 w-6 mr-2;
+  }
+  .i-md {
+    @apply h-8 w-8;
+  }
+  .container-md {
+    @apply container mx-auto px-4 py-8 text-text-light dark:text-text-dark max-w-md md:max-w-2xl lg:max-w-4xl bg-background-light dark:bg-background-dark;
+  }
+  .blog-link {
+    @apply block rounded-lg border-solid shadow-lg dark:border-accent-dark hover:text-primary-light hover:dark:text-primary-dark hover:bg-accent-light dark:hover:bg-accent-dark;
+  }
+}
